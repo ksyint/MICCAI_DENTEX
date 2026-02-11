@@ -1,15 +1,9 @@
-"""
-Default configuration for Semi-Supervised Tooth Classification
-"""
-
 import argparse
 
-
 def get_default_config():
-    """Get default configuration arguments"""
+
     parser = argparse.ArgumentParser(description='Semi-Supervised Tooth Classification with MPL')
-    
-    # Data settings
+
     parser.add_argument('--data_root', type=str, default='./data/images',
                         help='root directory of images')
     parser.add_argument('--labeled_file', type=str, default='./data/labeled.txt',
@@ -22,8 +16,7 @@ def get_default_config():
                         help='number of classes')
     parser.add_argument('--img_size', type=int, default=224,
                         help='input image size')
-    
-    # Model settings
+
     parser.add_argument('--model', type=str, default='resnet50',
                         choices=['resnet18', 'resnet34', 'resnet50', 'resnet101', 'resnet152',
                                 'efficientnet_b0', 'efficientnet_b1', 'efficientnet_b2',
@@ -38,8 +31,7 @@ def get_default_config():
                         help='weight for bottom-region guidance (0-1)')
     parser.add_argument('--dropout', type=float, default=0.0,
                         help='dropout rate')
-    
-    # Training settings
+
     parser.add_argument('--epochs', type=int, default=300,
                         help='number of training epochs')
     parser.add_argument('--batch_size', type=int, default=32,
@@ -54,8 +46,7 @@ def get_default_config():
                         help='weight decay')
     parser.add_argument('--nesterov', action='store_true', default=True,
                         help='use nesterov momentum')
-    
-    # Semi-supervised settings
+
     parser.add_argument('--use_mpl', action='store_true', default=True,
                         help='use Meta Pseudo Label')
     parser.add_argument('--threshold', type=float, default=0.95,
@@ -68,8 +59,7 @@ def get_default_config():
                         help='EMA decay rate for teacher (0 to disable)')
     parser.add_argument('--ema_warmup_steps', type=int, default=0,
                         help='warmup steps for EMA')
-    
-    # Learning rate schedule
+
     parser.add_argument('--lr_schedule', type=str, default='cosine',
                         choices=['cosine', 'step', 'multistep'],
                         help='learning rate schedule')
@@ -77,22 +67,19 @@ def get_default_config():
                         help='warmup epochs')
     parser.add_argument('--milestones', type=int, nargs='+', default=[150, 225],
                         help='milestones for MultiStepLR')
-    
-    # Augmentation settings
+
     parser.add_argument('--weak_aug', action='store_true', default=True,
                         help='use weak augmentation')
     parser.add_argument('--strong_aug', action='store_true', default=True,
                         help='use strong augmentation (RandAugment)')
-    
-    # Hardware settings
+
     parser.add_argument('--gpu', type=str, default='0',
                         help='GPU IDs to use (comma separated)')
     parser.add_argument('--num_workers', type=int, default=4,
                         help='number of data loading workers')
     parser.add_argument('--amp', action='store_true', default=True,
                         help='use automatic mixed precision')
-    
-    # Logging and checkpoints
+
     parser.add_argument('--checkpoint_dir', type=str, default='./checkpoint',
                         help='directory to save checkpoints')
     parser.add_argument('--log_dir', type=str, default='./logs',
@@ -103,40 +90,26 @@ def get_default_config():
                         help='log training stats every N steps')
     parser.add_argument('--tensorboard', action='store_true',
                         help='use tensorboard for logging')
-    
-    # Resume training
+
     parser.add_argument('--resume', type=str, default='',
                         help='path to checkpoint to resume from')
-    
-    # Evaluation
+
     parser.add_argument('--eval_only', action='store_true',
                         help='only evaluate without training')
-    
-    # Random seed
+
     parser.add_argument('--seed', type=int, default=42,
                         help='random seed for reproducibility')
-    
+
     return parser
 
-
 def update_config(args):
-    """
-    Update and validate configuration
-    
-    Args:
-        args: parsed arguments
-    
-    Returns:
-        args: updated arguments
-    """
+
     import os
     import torch
-    
-    # Create directories
+
     os.makedirs(args.checkpoint_dir, exist_ok=True)
     os.makedirs(args.log_dir, exist_ok=True)
-    
-    # Set device
+
     if torch.cuda.is_available():
         os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
         args.device = torch.device('cuda')
@@ -144,22 +117,19 @@ def update_config(args):
     else:
         args.device = torch.device('cpu')
         args.n_gpu = 0
-    
-    # Normalization constants (ImageNet)
+
     args.mean = [0.485, 0.456, 0.406]
     args.std = [0.229, 0.224, 0.225]
-    
-    # Update batch size for unlabeled data
-    args.unlabeled_batch_size = args.batch_size * args.mu
-    
-    return args
 
+    args.unlabeled_batch_size = args.batch_size * args.mu
+
+    return args
 
 if __name__ == '__main__':
     parser = get_default_config()
     args = parser.parse_args()
     args = update_config(args)
-    
+
     print("Configuration:")
     print("-" * 60)
     for arg in vars(args):

@@ -1,7 +1,3 @@
-"""
-Data package for Semi-Supervised Tooth Classification
-"""
-
 from .dataset import (
     ToothDataset, LabeledDataset, UnlabeledDataset,
     SemiSupervisedDataset, load_data_list, split_labeled_unlabeled,

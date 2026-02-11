@@ -1,8 +1,3 @@
-"""
-Models package for Semi-Supervised Tooth Classification
-Includes ResNet, EfficientNet, VGG with CBAM and Guided Attention
-"""
-
 from .model_factory import create_model, get_available_models, MODEL_REGISTRY
 from .guided_attention import (
     GuidedSpatialAttention, AdaptiveGuidedAttention,
